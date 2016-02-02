@@ -1,0 +1,28 @@
+c:\users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\bin\Debug\GMailGet.exe.config
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\bin\Debug\GMailGet.exe
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\bin\Debug\GMailGet.pdb
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\GMailGet.csprojResolveAssemblyReference.cache
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\MainWindow.g.cs
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\App.g.cs
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\GMailGet_MarkupCompile.cache
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\GMailGet_MarkupCompile.lref
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\MainWindow.baml
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\GMailGet.g.resources
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\GMailGet.Properties.Resources.resources
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\GMailGet.csproj.GenerateResource.Cache
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\GMailGet.exe
+c:\Users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\obj\Debug\GMailGet.pdb
+c:\users\hiromoto_2\documents\visual studio 2015\Projects\GMailGet\GMailGet\bin\Debug\TKMP.dll
+G:\GmailGet Sample\GMailGet\GMailGet\bin\Debug\GMailGet.exe.config
+G:\GmailGet Sample\GMailGet\GMailGet\obj\Debug\GMailGet.exe
+G:\GmailGet Sample\GMailGet\GMailGet\obj\Debug\GMailGet.pdb
+G:\GmailGet Sample\GMailGet\GMailGet\bin\Debug\GMailGet.exe
+G:\GmailGet Sample\GMailGet\GMailGet\bin\Debug\GMailGet.pdb
+G:\GmailGet Sample\GMailGet\GMailGet\obj\Debug\MainWindow.g.cs
+G:\GmailGet Sample\GMailGet\GMailGet\obj\Debug\App.g.cs
+G:\GmailGet Sample\GMailGet\GMailGet\obj\Debug\GMailGet_MarkupCompile.cache
+G:\GmailGet Sample\GMailGet\GMailGet\obj\Debug\GMailGet_MarkupCompile.lref
+G:\GmailGet Sample\GMailGet\GMailGet\obj\Debug\MainWindow.baml
+G:\GmailGet Sample\GMailGet\GMailGet\obj\Debug\GMailGet.g.resources
+G:\GmailGet Sample\GMailGet\GMailGet\obj\Debug\GMailGet.Properties.Resources.resources
+G:\GmailGet Sample\GMailGet\GMailGet\obj\Debug\GMailGet.csproj.GenerateResource.Cache
