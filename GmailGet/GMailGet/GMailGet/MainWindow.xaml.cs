@@ -22,7 +22,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows.Threading;
 
-namespace GMailGet
+namespace MailGet
 {
     public struct RowItem
     {

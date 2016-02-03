@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMailGet", "GMailGet\GMailGet.csproj", "{F6FAFC61-F351-4C78-B35A-857B8B5637E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailGet", "GMailGet\MailGet.csproj", "{F6FAFC61-F351-4C78-B35A-857B8B5637E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
