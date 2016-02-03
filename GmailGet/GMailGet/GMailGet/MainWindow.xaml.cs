@@ -52,6 +52,9 @@ namespace GMailGet
             textBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
             this.Loaded += Window_Loaded;
 
+            String[] items =   {"imap.gmail.com","imap.mail.yahoo.co.jp" };
+            foreach (var item in items)
+                combo_server.Items.Add(item);
         }
 
         public void mailDL()
@@ -73,6 +76,76 @@ namespace GMailGet
             view.Source = rowItems;
             listView.DataContext = view;
 
+        }
+        public void mailDL2()
+        {
+            view = new CollectionViewSource();
+            rowItems = new ObservableCollection<RowItem>();
+
+            
+            
+            Mailbox[] mbs = imap.GetMailBox();
+            String msg = "";
+            foreach (Mailbox mb in mbs)
+            {
+                msg += mb.Name + "\n";
+                MailData_Imap[] mdi = mb.MailDatas;
+                
+                
+                foreach (MailData_Imap item in mdi)
+                {
+                    item.BodyLoaded += MailData_BodyLoaded2;
+                    item.ReadBodyAnsync();
+                    
+                }
+
+            }
+            MessageBox.Show(msg);
+            
+            view.Source = rowItems;
+            listView.DataContext = view;
+        }
+        private void MailData_BodyLoaded2(object sender, EventArgs e)
+        {
+            MailData_Imap MailData = (MailData_Imap)sender;
+            MailData.ReadBody();
+            MailData.ReadHeader();
+
+
+            // 本文無し( 本文が必要な場合は、false で、reader.MainText )
+            MailReader reader = new MailReader(MailData.DataStream, false);
+
+            // UI スレッドへの処理( この場合、post_state は null )
+            sc.Post((object post_state) =>
+            {
+                
+                RowItem item;
+                // ヘッダの一覧より、目的のヘッダを探す
+                foreach (TKMP.Reader.Header.HeaderString headerdata in reader.HeaderCollection)
+                {
+                    
+                    string from = reader.HeaderCollection.HeaderItem("From").Data;
+                    string subject = reader.HeaderCollection.HeaderItem("Subject").Data;
+                    string mdate = reader.HeaderCollection.HeaderItem("Date").Data;
+
+                    item = new RowItem
+                    {
+                        From = from,
+                        Subject = subject,
+                        MDate = mdate,
+                        MText = reader.MainText
+                    };
+                    rowItems.Remove(item);
+                    rowItems.Insert(0, item);
+
+                    
+                }
+
+                // 行追加
+            }, null);
+
+            // イベント削除
+            MailData.BodyLoaded -= new EventHandler(MailData_BodyLoaded2);
         }
         private void MailData_BodyLoaded(object sender, EventArgs e)
         {
@@ -138,9 +211,16 @@ namespace GMailGet
 
         private void button_connect_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(combo_server.Text) || string.IsNullOrWhiteSpace(textBox_Pass.Password)
+                || string.IsNullOrWhiteSpace(textBox_port.Text) || string.IsNullOrWhiteSpace(textBox_userName.Text))
+            {
+                MessageBox.Show("入力項目に空白があります");
+                return;
+            }
+                
             //imap
             logon = new BasicImapLogon(textBox_userName.Text, textBox_Pass.Password);
-            imap = new ImapClient(logon, textBox_server.Text, int.Parse(textBox_port.Text));
+            imap = new ImapClient(logon, combo_server.Text, int.Parse(textBox_port.Text));
 
             //ＳＳＬを使用します
             imap.AuthenticationProtocol = TKMP.Net.AuthenticationProtocols.SSL;
@@ -153,14 +233,19 @@ namespace GMailGet
                 MessageBox.Show("接続失敗");
                 return;
             }
-
-            if (imap.GetMailList() != null)
+            else
             {
-                //着信件数の読み出し
-                int mailCnt = imap.GetMailList().Length;
-                mailDL();
-                
+                MessageBox.Show("接続成功");
             }
+
+            if (imap.GetMailBox() != null)
+            {
+                
+                
+                mailDL2();
+
+            }
+            
             
         }
     }
