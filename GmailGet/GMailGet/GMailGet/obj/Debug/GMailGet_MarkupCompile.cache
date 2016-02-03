@@ -4,16 +4,28 @@
 winexe
 C#
 .cs
+<<<<<<< HEAD
 C:\Users\hiromoto_2\Documents\GitHub\GmailGet\GmailGet\GMailGet\GMailGet\obj\Debug\
+=======
+C:\Users\1133002\Documents\GitHub\GmailGet\GmailGet\GMailGet\GMailGet\obj\Debug\
+>>>>>>> origin/master
 GMailGet
 none
 false
 DEBUG;TRACE
+<<<<<<< HEAD
 C:\Users\hiromoto_2\Documents\GitHub\GmailGet\GmailGet\GMailGet\GMailGet\App.xaml
 11151548125
 
 5-2017746502
 14250864201
+=======
+C:\Users\1133002\Documents\GitHub\GmailGet\GmailGet\GMailGet\GMailGet\App.xaml
+11151548125
+
+5-2017746502
+141106643442
+>>>>>>> origin/master
 MainWindow.xaml;
 
 False

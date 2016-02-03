@@ -24,9 +24,9 @@
         <Label Content="Pass" HorizontalAlignment="Left" Margin="236,12,0,0" VerticalAlignment="Top" Width="42"/>
         <PasswordBox x:Name="textBox_Pass" HorizontalAlignment="Left" Margin="278,14,0,0" VerticalAlignment="Top" Height="23" Width="139"/>
         <Label Content="server" HorizontalAlignment="Left" Margin="104,49,0,0" VerticalAlignment="Top" Width="62"/>
-        <TextBox x:Name="textBox_server" HorizontalAlignment="Left" Height="23" Margin="172,49,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="151"/>
         <Button x:Name="button_connect" Content="接続" HorizontalAlignment="Left" Margin="552,55,0,0" VerticalAlignment="Top" Width="75" Click="button_connect_Click"/>
-        <TextBox x:Name="textBox_port" HorizontalAlignment="Left" Height="23" Margin="403,51,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="textBox_port" Text="993" HorizontalAlignment="Left" Height="23" Margin="403,51,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <Label Content="port" HorizontalAlignment="Left" Margin="364,49,0,0" VerticalAlignment="Top" Width="34"/>
+        <ComboBox x:Name="combo_server" HorizontalAlignment="Left" Margin="171,55,0,0" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </Window>
