@@ -43,6 +43,7 @@ namespace MailGet
         private SynchronizationContext sc = null;
         private ImapClient imap = null;
         private BasicImapLogon logon;
+        private int port = 993;
 
         public MainWindow()
         {
@@ -57,27 +58,9 @@ namespace MailGet
                 combo_server.Items.Add(item);
         }
 
-        public void mailDL()
-        {
-            view = new CollectionViewSource();
-            rowItems = new ObservableCollection<RowItem>();
-
-
-            // 非同期で全て表示
-            foreach (var data in imap.GetMailList())
-            {
-                // 個別にイベント登録
-                data.BodyLoaded += new EventHandler(MailData_BodyLoaded);
-                // 非同期処理開始
-                data.ReadBodyAnsync();
-
-            }
-
-            view.Source = rowItems;
-            listView.DataContext = view;
-
-        }
-        public void mailDL2()
+        
+        //Yahooメール用
+        public void YMailDL()
         {
             view = new CollectionViewSource();
             rowItems = new ObservableCollection<RowItem>();
@@ -94,18 +77,18 @@ namespace MailGet
                 
                 foreach (MailData_Imap item in mdi)
                 {
-                    item.BodyLoaded += MailData_BodyLoaded2;
+                    item.BodyLoaded += YMailData_BodyLoaded;
                     item.ReadBodyAnsync();
                     
                 }
 
             }
-            MessageBox.Show(msg);
+            
             
             view.Source = rowItems;
             listView.DataContext = view;
         }
-        private void MailData_BodyLoaded2(object sender, EventArgs e)
+        private void YMailData_BodyLoaded(object sender, EventArgs e)
         {
             MailData_Imap MailData = (MailData_Imap)sender;
             MailData.ReadBody();
@@ -145,9 +128,30 @@ namespace MailGet
             }, null);
 
             // イベント削除
-            MailData.BodyLoaded -= new EventHandler(MailData_BodyLoaded2);
+            MailData.BodyLoaded -= new EventHandler(YMailData_BodyLoaded);
         }
-        private void MailData_BodyLoaded(object sender, EventArgs e)
+        //Gmail用
+        public void GmailDL()
+        {
+            view = new CollectionViewSource();
+            rowItems = new ObservableCollection<RowItem>();
+
+
+            // 非同期で全て表示
+            foreach (var data in imap.GetMailList())
+            {
+                // 個別にイベント登録
+                data.BodyLoaded += new EventHandler(GMailData_BodyLoaded);
+                // 非同期処理開始
+                data.ReadBodyAnsync();
+
+            }
+
+            view.Source = rowItems;
+            listView.DataContext = view;
+
+        }
+        private void GMailData_BodyLoaded(object sender, EventArgs e)
         {
             IMailData MailData = (IMailData)sender;
             MailData.ReadBody();
@@ -182,7 +186,7 @@ namespace MailGet
             }, null);
 
             // イベント削除
-            MailData.BodyLoaded -= new EventHandler(MailData_BodyLoaded);
+            MailData.BodyLoaded -= new EventHandler(GMailData_BodyLoaded);
         }
 
         // UI スレッドへの処理用
@@ -212,7 +216,7 @@ namespace MailGet
         private void button_connect_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(combo_server.Text) || string.IsNullOrWhiteSpace(textBox_Pass.Password)
-                || string.IsNullOrWhiteSpace(textBox_port.Text) || string.IsNullOrWhiteSpace(textBox_userName.Text))
+                ||  string.IsNullOrWhiteSpace(textBox_userName.Text))
             {
                 MessageBox.Show("入力項目に空白があります");
                 return;
@@ -220,7 +224,7 @@ namespace MailGet
                 
             //imap
             logon = new BasicImapLogon(textBox_userName.Text, textBox_Pass.Password);
-            imap = new ImapClient(logon, combo_server.Text, int.Parse(textBox_port.Text));
+            imap = new ImapClient(logon, combo_server.Text, port);
 
             //ＳＳＬを使用します
             imap.AuthenticationProtocol = TKMP.Net.AuthenticationProtocols.SSL;
@@ -238,13 +242,26 @@ namespace MailGet
                 MessageBox.Show("接続成功");
             }
 
-            if (imap.GetMailBox() != null)
-            {
-                
-                
-                mailDL2();
+            if (combo_server.SelectedValue.ToString().Contains("yahoo"))
+            {//Gmail処理
+                if (imap.GetMailBox() != null)
+                {
+                    YMailDL();
+
+                }
+                else MessageBox.Show("メールが存在しませぬ");
 
             }
+            else
+            {//Yahooメール処理
+                if (imap.GetMailList() != null)
+                {
+                    GmailDL();
+                }
+                else MessageBox.Show("メールが存在しませぬ");
+            }
+
+            
             
             
         }

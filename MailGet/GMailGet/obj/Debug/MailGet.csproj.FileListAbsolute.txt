@@ -13,3 +13,16 @@ C:\Users\hiromoto_2\Documents\GitHub\GmailGet\GmailGet\GMailGet\GMailGet\obj\Deb
 C:\Users\hiromoto_2\Documents\GitHub\GmailGet\GmailGet\GMailGet\GMailGet\obj\Debug\GMailGet.exe
 C:\Users\hiromoto_2\Documents\GitHub\GmailGet\GmailGet\GMailGet\GMailGet\obj\Debug\GMailGet.pdb
 C:\Users\hiromoto_2\Documents\GitHub\GmailGet\GmailGet\GMailGet\GMailGet\bin\Debug\MailGet.exe.config
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\bin\Debug\MailGet.exe.config
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\bin\Debug\MailGet.exe
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\bin\Debug\MailGet.pdb
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MainWindow.g.cs
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\App.g.cs
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MailGet_MarkupCompile.cache
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MailGet_MarkupCompile.lref
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MainWindow.baml
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MailGet.g.resources
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MailGet.Properties.Resources.resources
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MailGet.csproj.GenerateResource.Cache
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MailGet.exe
+C:\Users\1133002\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MailGet.pdb

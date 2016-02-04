@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GMailGet"
         mc:Ignorable="d"
-        Title="MainWindow" Height="546.97" Width="696.212">
-    <Grid>
-        <ListView x:Name="listView" HorizontalAlignment="Left" Height="400" Margin="10,87,0,0" VerticalAlignment="Top" Width="313" ItemsSource="{Binding}" SelectionChanged="listView_SelectionChanged">
+        Title="MainWindow" Height="636.522" Width="758.899">
+    <Grid Margin="0,0,2,-21">
+        <ListView x:Name="listView" HorizontalAlignment="Left" Height="400" Margin="20,145,0,0" VerticalAlignment="Top" Width="313" ItemsSource="{Binding}" SelectionChanged="listView_SelectionChanged">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="From" DisplayMemberBinding="{Binding From}"/>
@@ -17,16 +17,17 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="400" Margin="338,87,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="350"/>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="1211,487,-598,0" VerticalAlignment="Top" Width="75"/>
-        <TextBox x:Name="textBox_userName" HorizontalAlignment="Left" Height="23" Margin="109,12,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Label Content="userName" HorizontalAlignment="Left" Margin="32,12,0,0" VerticalAlignment="Top" Width="72"/>
-        <Label Content="Pass" HorizontalAlignment="Left" Margin="236,12,0,0" VerticalAlignment="Top" Width="42"/>
-        <PasswordBox x:Name="textBox_Pass" HorizontalAlignment="Left" Margin="278,14,0,0" VerticalAlignment="Top" Height="23" Width="139"/>
-        <Label Content="server" HorizontalAlignment="Left" Margin="104,49,0,0" VerticalAlignment="Top" Width="62"/>
-        <Button x:Name="button_connect" Content="接続" HorizontalAlignment="Left" Margin="552,55,0,0" VerticalAlignment="Top" Width="75" Click="button_connect_Click"/>
-        <TextBox x:Name="textBox_port" Text="993" HorizontalAlignment="Left" Height="23" Margin="403,51,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Label Content="port" HorizontalAlignment="Left" Margin="364,49,0,0" VerticalAlignment="Top" Width="34"/>
-        <ComboBox x:Name="combo_server" HorizontalAlignment="Left" Margin="171,55,0,0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="400" Margin="348,145,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="350"/>
+        <TextBox x:Name="textBox_userName" HorizontalAlignment="Left" Height="23" Margin="119,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Label Content="userName" HorizontalAlignment="Left" Margin="42,70,0,0" VerticalAlignment="Top" Width="72"/>
+        <Label Content="Pass" HorizontalAlignment="Left" Margin="246,70,0,0" VerticalAlignment="Top" Width="42"/>
+        <PasswordBox x:Name="textBox_Pass" HorizontalAlignment="Left" Margin="288,72,0,0" VerticalAlignment="Top" Height="23" Width="139"/>
+        <Label Content="server" HorizontalAlignment="Left" Margin="441,68,0,0" VerticalAlignment="Top" Width="62"/>
+        <Button x:Name="button_connect" Content="接続" HorizontalAlignment="Left" Margin="508,116,0,0" VerticalAlignment="Top" Width="75" Click="button_connect_Click"/>
+        <ComboBox x:Name="combo_server" HorizontalAlignment="Left" Margin="508,74,0,0" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="button_save" Content="設定の保存" HorizontalAlignment="Left" Margin="623,117,0,0" VerticalAlignment="Top" Width="75"/>
+        <ComboBox HorizontalAlignment="Left" Margin="181,17,0,0" VerticalAlignment="Top" Width="120"/>
+        <RadioButton x:Name="radio_old" Content="登録アカウントを使用" HorizontalAlignment="Left" Margin="42,24,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <RadioButton x:Name="radio_new" Content="新たに入力" HorizontalAlignment="Left" Margin="42,43,0,0" VerticalAlignment="Top" IsChecked="True"/>
     </Grid>
 </Window>
