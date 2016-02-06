@@ -12,15 +12,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using TKMP;
 using TKMP.Net;
 using TKMP.Reader;
 using System.IO;
-using System.Net;
-using TKMP.Reader.Header;
 using System.Collections.ObjectModel;
 using System.Threading;
-using System.Windows.Threading;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 
 namespace MailGet
 {
@@ -31,6 +29,19 @@ namespace MailGet
         public string MDate { get; set; }
         public string MText { get; set; }
     }
+    [Serializable]
+    public struct UserInfo
+    {
+        public string userName { get; set; }
+        public string userPass { get; set; }
+        public string srvName { get; set; }
+    }
+
+    [Serializable]
+    public class AppInfo{
+        public Dictionary<String, UserInfo> UserDict { get; set; }
+    }
+
 
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
@@ -42,13 +53,16 @@ namespace MailGet
 
         private SynchronizationContext sc = null;
         private ImapClient imap = null;
-        private BasicImapLogon logon;
         private int port = 993;
+        private Dictionary<String, UserInfo> userDict;
 
+        private static string pass = "iusegdhtjhkj:kkopjhgygfgh";
+        
         public MainWindow()
         {
             InitializeComponent();
             textBox.IsReadOnly = true;
+
             textBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             textBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
             this.Loaded += Window_Loaded;
@@ -56,17 +70,59 @@ namespace MailGet
             String[] items =   {"imap.gmail.com","imap.mail.yahoo.co.jp" };
             foreach (var item in items)
                 combo_server.Items.Add(item);
+
+            readConfig();
+
+        }
+        private void readConfig()
+        {
+            using (FileStream fs = returnFileStream(FileMode.OpenOrCreate))
+            {
+                userDict = new Dictionary<string, UserInfo>();
+                try
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+
+                    if (fs.Length > 0)
+                    {
+                        AppInfo info = (AppInfo)bf.Deserialize(fs);
+
+                        userDict = info.UserDict;
+
+
+                        fs.Close();
+
+                        foreach (var item in userDict.Keys)
+                            combo_insert.Items.Add(PasswordManager.DecryptString(item, pass));
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.StackTrace);
+                }
+            }
+        }
+        //ファイル周りの初期設定ができてない場合初期設定してくれる上に
+        //userInfo.configファイルのFileStreamを返す
+        private FileStream returnFileStream(FileMode file)
+        {
+
+            String cPath = Directory.GetCurrentDirectory();
+            if (Directory.GetDirectories(@".", "files", SearchOption.AllDirectories).Count() == 0)
+            {
+                Directory.CreateDirectory("files");
+            }
+
+            
+            return new FileStream(Directory.GetCurrentDirectory() + @"\files\userInfo.config", file);
         }
 
-        
         //Yahooメール用
         public void YMailDL()
         {
             view = new CollectionViewSource();
             rowItems = new ObservableCollection<RowItem>();
-
-            
-            
             Mailbox[] mbs = imap.GetMailBox();
             String msg = "";
             foreach (Mailbox mb in mbs)
@@ -120,10 +176,7 @@ namespace MailGet
                     };
                     rowItems.Remove(item);
                     rowItems.Insert(0, item);
-
-                    
                 }
-
                 // 行追加
             }, null);
 
@@ -212,20 +265,39 @@ namespace MailGet
                 textBox.Text = item.MText;
             }
         }
+        private ImapClient returnImapClient()
+        {
+            String userName;
+            String userPass;
+            String srvName;
+            if (radio_new.IsChecked.Value)
+            {
+                userName = textBox_userName.Text;
+                userPass = textBox_Pass.Password;
+                srvName = combo_server.Text;
+            }
+            else
+            {
+                userName = combo_insert.Text;
+                UserInfo info = userDict[PasswordManager.EncryptString(combo_insert.Text, pass)];
+                userPass = 
+                    PasswordManager.DecryptString(info.userPass,pass);
+                srvName = info.srvName;
+            }
+            BasicImapLogon logon = new BasicImapLogon(userName, userPass);
+            return new ImapClient(logon, srvName, port);
+
+        }
+        
 
         private void button_connect_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(combo_server.Text) || string.IsNullOrWhiteSpace(textBox_Pass.Password)
-                ||  string.IsNullOrWhiteSpace(textBox_userName.Text))
-            {
-                MessageBox.Show("入力項目に空白があります");
-                return;
-            }
-                
-            //imap
-            logon = new BasicImapLogon(textBox_userName.Text, textBox_Pass.Password);
-            imap = new ImapClient(logon, combo_server.Text, port);
 
+            if (checkEmp()) return;
+            
+
+
+            imap = returnImapClient();
             //ＳＳＬを使用します
             imap.AuthenticationProtocol = TKMP.Net.AuthenticationProtocols.SSL;
             //証明書に問題があった場合に独自の処理を追加します
@@ -237,33 +309,89 @@ namespace MailGet
                 MessageBox.Show("接続失敗");
                 return;
             }
-            else
-            {
-                MessageBox.Show("接続成功");
-            }
+            else MessageBox.Show("接続成功"); 
 
-            if (combo_server.SelectedValue.ToString().Contains("yahoo"))
-            {//Gmail処理
-                if (imap.GetMailBox() != null)
-                {
-                    YMailDL();
-
-                }
-                else MessageBox.Show("メールが存在しませぬ");
-
-            }
-            else
+            if (imap.HostName.Contains("yahoo"))
             {//Yahooメール処理
-                if (imap.GetMailList() != null)
-                {
-                    GmailDL();
-                }
+                if (imap.GetMailBox() != null) YMailDL();
+                else MessageBox.Show("メールが存在しませぬ");
+
+            }
+            else
+            {//GMail処理
+                if (imap.GetMailList() != null) GmailDL();
                 else MessageBox.Show("メールが存在しませぬ");
             }
+        }
+        private bool checkEmp()
+        {
+            if ((string.IsNullOrWhiteSpace(combo_server.Text) || string.IsNullOrWhiteSpace(textBox_Pass.Password)
+                || string.IsNullOrWhiteSpace(textBox_userName.Text)) && radio_new.IsChecked.Value)
+            {
+                MessageBox.Show("入力項目に空白があります");
+                return true;
+            }
+            return false;
+        }
+        
+        
+        private void button_save_Click(object sender, RoutedEventArgs e)
+        {
+            if (checkEmp()) return;
+            StringBuilder key = new StringBuilder();
+            key.AppendFormat(textBox_userName.Text + "({0})", combo_server.Text);
+            if (userDict.ContainsKey(PasswordManager.EncryptString(key.ToString(), pass)))
+            {
+                MessageBox.Show("すでにそのアカウントは存在しています");
+                return;
+            }
+            
+            userDict.Add(PasswordManager.EncryptString(key.ToString(), pass),
+                new UserInfo
+                {
+                    userName = PasswordManager.EncryptString(textBox_userName.Text,pass),
+                    userPass = PasswordManager.EncryptString(textBox_Pass.Password,pass),
+                    srvName = combo_server.Text
+                });
+            
+            using(FileStream fs = returnFileStream(FileMode.Create))
+            {
+                BinaryWriter bw = new BinaryWriter(fs);
+                BinaryFormatter bf = new BinaryFormatter();
 
-            
-            
-            
+                AppInfo info = new AppInfo();
+                info.UserDict = userDict;
+                bf.Serialize(fs, info);
+                
+                fs.Close();
+            }
+            readConfig();
+        }
+
+        private void radio_new_Checked(object sender, RoutedEventArgs e)
+        {
+            changeInputEnable(true);
+        }
+
+        private void radio_old_Checked(object sender, RoutedEventArgs e)
+        {
+            changeInputEnable(false);
+        }
+        //radioボタン処理
+        private void changeInputEnable(bool flg)
+        {
+            combo_insert.IsEnabled = !flg;
+
+            combo_server.IsEnabled = flg;
+            textBox_userName.IsEnabled = flg;
+            textBox_Pass.IsEnabled = flg;
+        }
+
+        private void button_clear_Click(object sender, RoutedEventArgs e)
+        {
+            combo_server.Text = "";
+            textBox_userName.Clear();
+            textBox_Pass.Clear();
         }
     }
 }
