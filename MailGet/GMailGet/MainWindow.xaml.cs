@@ -19,6 +19,8 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
+using System.Windows.Threading;
+using Hardcodet.Wpf.TaskbarNotification;
 
 namespace MailGet
 {
@@ -48,6 +50,7 @@ namespace MailGet
     /// </summary>
     public partial class MainWindow : Window
     {
+
         CollectionViewSource view;
         ObservableCollection<RowItem> rowItems;
 
@@ -57,7 +60,10 @@ namespace MailGet
         private Dictionary<String, UserInfo> userDict;
 
         private static string pass = "iusegdhtjhkj:kkopjhgygfgh";
+
         
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -65,7 +71,7 @@ namespace MailGet
 
             textBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             textBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
-            this.Loaded += Window_Loaded;
+            sc = SynchronizationContext.Current;
 
             String[] items =   {"imap.gmail.com","imap.mail.yahoo.co.jp" };
             foreach (var item in items)
@@ -73,11 +79,14 @@ namespace MailGet
 
             readConfig();
 
+            
         }
+
         private void readConfig()
         {
             using (FileStream fs = returnFileStream(FileMode.OpenOrCreate))
             {
+
                 userDict = new Dictionary<string, UserInfo>();
                 try
                 {
@@ -91,7 +100,7 @@ namespace MailGet
 
 
                         fs.Close();
-
+                        combo_insert.Items.Clear();
                         foreach (var item in userDict.Keys)
                             combo_insert.Items.Add(PasswordManager.DecryptString(item, pass));
                     }
@@ -113,8 +122,6 @@ namespace MailGet
             {
                 Directory.CreateDirectory("files");
             }
-
-            
             return new FileStream(Directory.GetCurrentDirectory() + @"\files\userInfo.config", file);
         }
 
@@ -139,8 +146,6 @@ namespace MailGet
                 }
 
             }
-            
-            
             view.Source = rowItems;
             listView.DataContext = view;
         }
@@ -149,7 +154,6 @@ namespace MailGet
             MailData_Imap MailData = (MailData_Imap)sender;
             MailData.ReadBody();
             MailData.ReadHeader();
-
 
             // 本文無し( 本文が必要な場合は、false で、reader.MainText )
             MailReader reader = new MailReader(MailData.DataStream, false);
@@ -214,7 +218,8 @@ namespace MailGet
             MailReader reader = new MailReader(MailData.DataStream, false);
 
             // UI スレッドへの処理( この場合、post_state は null )
-            sc.Post((object post_state) => {
+            sc.Post((object post_state) =>
+            {
 
                 RowItem item;
                 // ヘッダの一覧より、目的のヘッダを探す
@@ -241,14 +246,6 @@ namespace MailGet
             // イベント削除
             MailData.BodyLoaded -= new EventHandler(GMailData_BodyLoaded);
         }
-
-        // UI スレッドへの処理用
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            
-            sc = SynchronizationContext.Current;
-        }
-
 
         private void imap_CertificateValidation(object sender, TKMP.Net.CertificateValidationArgs e)
         {
@@ -278,14 +275,23 @@ namespace MailGet
             }
             else
             {
-                userName = combo_insert.Text;
+                userName = combo_insert.Text.Split('(')[0];
                 UserInfo info = userDict[PasswordManager.EncryptString(combo_insert.Text, pass)];
                 userPass = 
                     PasswordManager.DecryptString(info.userPass,pass);
-                srvName = info.srvName;
+                srvName = PasswordManager.DecryptString(info.srvName, pass);
             }
+            
+
             BasicImapLogon logon = new BasicImapLogon(userName, userPass);
-            return new ImapClient(logon, srvName, port);
+
+            ImapClient imap = new ImapClient(logon, srvName, port);
+            //ＳＳＬを使用します
+            imap.AuthenticationProtocol = TKMP.Net.AuthenticationProtocols.SSL;
+            //証明書に問題があった場合に独自の処理を追加します
+            imap.CertificateValidation += new CertificateValidationHandler(imap_CertificateValidation);
+
+            return imap;
 
         }
         
@@ -296,20 +302,14 @@ namespace MailGet
             if (checkEmp()) return;
             
 
-
-            imap = returnImapClient();
-            //ＳＳＬを使用します
-            imap.AuthenticationProtocol = TKMP.Net.AuthenticationProtocols.SSL;
-            //証明書に問題があった場合に独自の処理を追加します
-            imap.CertificateValidation += new CertificateValidationHandler(imap_CertificateValidation);
-
+            /*
             //接続開始
             if (!imap.Connect())
             {
                 MessageBox.Show("接続失敗");
                 return;
             }
-            else MessageBox.Show("接続成功"); 
+            else 
 
             if (imap.HostName.Contains("yahoo"))
             {//Yahooメール処理
@@ -322,6 +322,27 @@ namespace MailGet
                 if (imap.GetMailList() != null) GmailDL();
                 else MessageBox.Show("メールが存在しませぬ");
             }
+            */
+            MailChecker mc = new MailChecker(returnImapClient());
+            /*
+                ３０秒ごとにメール数を比較する。
+                増減により更新　減った場合は更新はするが無視、
+                増えた場合は増えた分が伝わるように通知する。
+                ・・・ImapClientをコンストラクタで渡す
+            */
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = new TimeSpan(0, 0, 10);
+            timer.Tick += (sender2, e2) => 
+            {
+
+                mc.checkImap(returnImapClient(), MyNotifyIcon);
+            };
+            timer.Start();
+        }
+        private void YmailMonitoring(ImapClient imap)
+        {
+            Mailbox mb = imap.GetMailBox()[imap.GetMailBox().Length - 1];
+
         }
         private bool checkEmp()
         {
@@ -338,6 +359,7 @@ namespace MailGet
         private void button_save_Click(object sender, RoutedEventArgs e)
         {
             if (checkEmp()) return;
+
             StringBuilder key = new StringBuilder();
             key.AppendFormat(textBox_userName.Text + "({0})", combo_server.Text);
             if (userDict.ContainsKey(PasswordManager.EncryptString(key.ToString(), pass)))
@@ -351,10 +373,14 @@ namespace MailGet
                 {
                     userName = PasswordManager.EncryptString(textBox_userName.Text,pass),
                     userPass = PasswordManager.EncryptString(textBox_Pass.Password,pass),
-                    srvName = combo_server.Text
+                    srvName = PasswordManager.EncryptString(combo_server.Text, pass)
                 });
-            
-            using(FileStream fs = returnFileStream(FileMode.Create))
+            configUpdate();
+        }
+        private void configUpdate()
+        {
+
+            using (FileStream fs = returnFileStream(FileMode.Create))
             {
                 BinaryWriter bw = new BinaryWriter(fs);
                 BinaryFormatter bf = new BinaryFormatter();
@@ -362,7 +388,7 @@ namespace MailGet
                 AppInfo info = new AppInfo();
                 info.UserDict = userDict;
                 bf.Serialize(fs, info);
-                
+
                 fs.Close();
             }
             readConfig();
@@ -392,6 +418,16 @@ namespace MailGet
             combo_server.Text = "";
             textBox_userName.Clear();
             textBox_Pass.Clear();
+        }
+
+        private void button_insert_delete_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(combo_insert.Text))
+            {
+                userDict.Remove(PasswordManager.EncryptString(combo_insert.Text,pass));
+                configUpdate();
+            }
+            else MessageBox.Show("アカウントを選択してください");
         }
     }
 }
