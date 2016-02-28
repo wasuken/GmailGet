@@ -61,7 +61,7 @@ namespace MailGet
 
         private static string pass = "iusegdhtjhkj:kkopjhgygfgh";
 
-        
+        DispatcherTimer timer;
 
 
         public MainWindow()
@@ -131,10 +131,10 @@ namespace MailGet
             view = new CollectionViewSource();
             rowItems = new ObservableCollection<RowItem>();
             Mailbox[] mbs = imap.GetMailBox();
-            String msg = "";
+            //String msg = "";
             foreach (Mailbox mb in mbs)
             {
-                msg += mb.Name + "\n";
+                //msg += mb.Name + "\n";
                 MailData_Imap[] mdi = mb.MailDatas;
                 
                 
@@ -162,31 +162,33 @@ namespace MailGet
             sc.Post((object post_state) =>
             {
                 
-                RowItem item;
-                // ヘッダの一覧より、目的のヘッダを探す
-                foreach (TKMP.Reader.Header.HeaderString headerdata in reader.HeaderCollection)
-                {
-                    
-                    string from = reader.HeaderCollection.HeaderItem("From").Data;
-                    string subject = reader.HeaderCollection.HeaderItem("Subject").Data;
-                    string mdate = reader.HeaderCollection.HeaderItem("Date").Data;
-
-                    item = new RowItem
-                    {
-                        From = from,
-                        Subject = subject,
-                        MDate = mdate,
-                        MText = reader.MainText
-                    };
-                    rowItems.Remove(item);
-                    rowItems.Insert(0, item);
-                }
+                RowItem item = returnRowItem(reader);
+                rowItems.Remove(item);
+                rowItems.Insert(0, item);
+                
                 // 行追加
             }, null);
 
             // イベント削除
             MailData.BodyLoaded -= new EventHandler(YMailData_BodyLoaded);
         }
+        private RowItem returnRowItem(MailReader reader)
+        {
+            RowItem item;
+            string from = reader.HeaderCollection.HeaderItem("From").Data;
+            string subject = reader.HeaderCollection.HeaderItem("Subject").Data;
+            string mdate = reader.HeaderCollection.HeaderItem("Date").Data;
+
+            item = new RowItem
+            {
+                From = from,
+                Subject = subject,
+                MDate = mdate,
+                MText = reader.MainText
+            };
+            return item;
+        }
+
         //Gmail用
         public void GmailDL()
         {
@@ -220,27 +222,14 @@ namespace MailGet
             // UI スレッドへの処理( この場合、post_state は null )
             sc.Post((object post_state) =>
             {
-
                 RowItem item;
                 // ヘッダの一覧より、目的のヘッダを探す
                 foreach (TKMP.Reader.Header.HeaderString headerdata in reader.HeaderCollection)
                 {
-                    string from = reader.HeaderCollection.HeaderItem("From").Data;
-                    string subject = reader.HeaderCollection.HeaderItem("Subject").Data;
-                    string mdate = reader.HeaderCollection.HeaderItem("Date").Data;
-
-                    item = new RowItem
-                    {
-                        From = from,
-                        Subject = subject,
-                        MDate = mdate,
-                        MText = reader.MainText
-                    };
+                    item = returnRowItem(reader);
                     rowItems.Remove(item);
                     rowItems.Insert(0, item);
                 }
-
-                // 行追加
             }, null);
 
             // イベント削除
@@ -262,11 +251,13 @@ namespace MailGet
                 textBox.Text = item.MText;
             }
         }
-        private ImapClient returnImapClient()
+        private ImapClient createImapClient()
         {
             String userName;
             String userPass;
             String srvName;
+           
+
             if (radio_new.IsChecked.Value)
             {
                 userName = textBox_userName.Text;
@@ -300,45 +291,44 @@ namespace MailGet
         {
 
             if (checkEmp()) return;
+
+
             
-
-            /*
-            //接続開始
-            if (!imap.Connect())
+            imap = createImapClient();
+            if (imap.Connect())
             {
-                MessageBox.Show("接続失敗");
-                return;
-            }
-            else 
+                timerStart();
+                if (imap.HostName.Contains("yahoo"))
+                {//Yahooメール処理
+                    if (imap.GetMailBox() != null) YMailDL();
+                    else MessageBox.Show("Yメールが存在しませぬ");
 
-            if (imap.HostName.Contains("yahoo"))
-            {//Yahooメール処理
-                if (imap.GetMailBox() != null) YMailDL();
-                else MessageBox.Show("メールが存在しませぬ");
-
+                }
+                else
+                {//GMail処理
+                    if (imap.GetMailList() != null) GmailDL();
+                    else MessageBox.Show("Gメールが存在しませぬ");
+                }
             }
-            else
-            {//GMail処理
-                if (imap.GetMailList() != null) GmailDL();
-                else MessageBox.Show("メールが存在しませぬ");
-            }
-            */
-            MailChecker mc = new MailChecker(returnImapClient());
-            /*
-                ３０秒ごとにメール数を比較する。
-                増減により更新　減った場合は更新はするが無視、
-                増えた場合は増えた分が伝わるように通知する。
-                ・・・ImapClientをコンストラクタで渡す
-            */
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(0, 0, 10);
-            timer.Tick += (sender2, e2) => 
+        }
+        private void timerStart()
+        {
+            if (timer != null) timer.Stop();
+            timer = new DispatcherTimer();
+            timer.Interval = new TimeSpan(0, 0, 30);
+            MailChecker mc = new MailChecker(imap);
+            
+            timer.Tick += (sender, e) => 
             {
-
-                mc.checkImap(returnImapClient(), MyNotifyIcon);
+                Task.Run(() => {
+                    mc.checkImap(imap, MyNotifyIcon);
+                });
+                
             };
+            
             timer.Start();
         }
+        
         private void YmailMonitoring(ImapClient imap)
         {
             Mailbox mb = imap.GetMailBox()[imap.GetMailBox().Length - 1];

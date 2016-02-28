@@ -43,3 +43,5 @@ C:\Users\hiromoto_2\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MailGet.
 C:\Users\hiromoto_2\Documents\GitHub\MailGet\MailGet\GMailGet\bin\Debug\Hardcodet.Wpf.TaskbarNotification.dll
 C:\Users\hiromoto_2\Documents\GitHub\MailGet\MailGet\GMailGet\bin\Debug\Hardcodet.Wpf.TaskbarNotification.pdb
 C:\Users\hiromoto_2\Documents\GitHub\MailGet\MailGet\GMailGet\bin\Debug\Hardcodet.Wpf.TaskbarNotification.xml
+C:\Users\hiromoto_2\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\Interop.SpeechLib.dll
+C:\Users\hiromoto_2\Documents\GitHub\MailGet\MailGet\GMailGet\obj\Debug\MailGet.csproj.ResolveComReference.cache

@@ -8,14 +8,14 @@
         mc:Ignorable="d"
         Height="636.522" Width="784.399">
     <Grid Margin="28,0,2,-21">
-        
-            <tb:TaskbarIcon x:Name="MyNotifyIcon"
+
+        <tb:TaskbarIcon x:Name="MyNotifyIcon"
                   IconSource="pack://application:,,,/img/CsIcon.ico"
                   ToolTipText="通知" Margin="0,0,-24,0">
-            </tb:TaskbarIcon>
-        
-        
-        <ListView x:Name="listView" HorizontalAlignment="Left" Height="400" Margin="20,145,0,0" VerticalAlignment="Top" Width="313" ItemsSource="{Binding}" SelectionChanged="listView_SelectionChanged">
+        </tb:TaskbarIcon>
+
+
+        <ListView x:Name="listView" HorizontalAlignment="Left" Height="400" Margin="20,199,0,0" VerticalAlignment="Top" Width="313" ItemsSource="{Binding}" SelectionChanged="listView_SelectionChanged">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="From" DisplayMemberBinding="{Binding From}"/>
@@ -40,5 +40,8 @@
         <Button x:Name="button_clear" Content="Clear" HorizontalAlignment="Left" Margin="537,116,0,0" VerticalAlignment="Top" Width="75" Click="button_clear_Click"/>
         <Button x:Name="button_insert_delete" Content="削除" HorizontalAlignment="Left" Margin="352,18,0,0" VerticalAlignment="Top" Width="75" Click="button_insert_delete_Click"/>
         <GridSplitter x:Name="gridSplitter" HorizontalAlignment="Left" Height="100" Margin="811,300,-67,0" VerticalAlignment="Top" Width="5"/>
+        <TextBlock x:Name="textBlock_page" HorizontalAlignment="Left" Margin="158,158,0,0" TextWrapping="Wrap" Text="1/1" VerticalAlignment="Top"/>
+        <Button x:Name="button_pageLeft" Content="＜" HorizontalAlignment="Left" Margin="20,155,0,0" VerticalAlignment="Top" Width="36"/>
+        <Button x:Name="button_pageRight" Content="＞" HorizontalAlignment="Left" Margin="297,155,0,0" VerticalAlignment="Top" Width="36"/>
     </Grid>
 </Window>
